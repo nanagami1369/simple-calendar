@@ -18,6 +18,7 @@ export default defineConfig({
       },
     },
   },
+  base: "/simple-calendar/",
   build: {
     outDir: "docs",
   },
