@@ -215,7 +215,7 @@ main {
     td {
       text-align: center;
       font-weight: bold;
-      font-size: 2em;
+      font-size: 2vw;
       border: solid 2px #535360;
       background-color: #f2f2f6;
       width: calc(100% / 7);
