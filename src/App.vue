@@ -50,7 +50,7 @@ const createCalendarDate = (year: number, month: number): CalendarCell[] => {
   for (let day = 1; day <= remainingDate; day++) {
     calendar[calendarIndex] = new CalendarCell(
       nextDate.getFullYear(),
-      nextDate.getMonth() + 1,
+      nextDate.getMonth(),
       day,
       false
     );
