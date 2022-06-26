@@ -1,4 +1,17 @@
 <script setup lang="ts">
+import { onMounted } from "vue";
+
+const fetchSyukujituData = async (): Promise<Map<string, string>> => {
+  const response = await fetch("./syukujitsu.csv");
+  const syukujituBuffer = await response.arrayBuffer();
+  const syukujituMap = new Map();
+  const syukujituData = new TextDecoder("shift-jis").decode(syukujituBuffer);
+  syukujituData.split("\r\n").forEach((line) => {
+    const dateAndSyukujituPair = line.split(",");
+    syukujituMap.set(dateAndSyukujituPair[0], dateAndSyukujituPair[1]);
+  });
+  return syukujituMap;
+};
 const createCalendarDate = (year: number, month: number): CalendarCell[] => {
   const calendar = new Array<CalendarCell>(42);
   let calendarIndex = 0;
@@ -8,7 +21,12 @@ const createCalendarDate = (year: number, month: number): CalendarCell[] => {
   // 先月
   for (let index = prevLastDayOfWeek; index >= 0; index--) {
     const day = prevLastDate.getDate() - index;
-    calendar[calendarIndex] = new CalendarCell(day, false);
+    calendar[calendarIndex] = new CalendarCell(
+      prevLastDate.getFullYear(),
+      prevLastDate.getMonth(),
+      day,
+      false
+    );
     calendarIndex++;
   }
 
@@ -17,25 +35,45 @@ const createCalendarDate = (year: number, month: number): CalendarCell[] => {
   currentLastDate.setMonth(currentLastDate.getMonth() + 1);
   currentLastDate.setDate(0);
   for (let day = 1; day <= currentLastDate.getDate(); day++) {
-    calendar[calendarIndex] = new CalendarCell(day, true);
+    calendar[calendarIndex] = new CalendarCell(
+      currentLastDate.getFullYear(),
+      currentLastDate.getMonth(),
+      day,
+      true
+    );
     calendarIndex++;
   }
   // 来月
+  const nextDate = new Date(year, month, 1);
+  nextDate.setMonth(nextDate.getMonth() + 1);
   const remainingDate = calendar.length - calendarIndex;
   for (let day = 1; day <= remainingDate; day++) {
-    calendar[calendarIndex] = new CalendarCell(day, false);
+    calendar[calendarIndex] = new CalendarCell(
+      nextDate.getFullYear(),
+      nextDate.getMonth() + 1,
+      day,
+      false
+    );
     calendarIndex++;
   }
   return calendar;
 };
 
 class CalendarCell {
+  year: Readonly<number>;
+  month: Readonly<number>;
   day: Readonly<number>;
   isCurrent: Readonly<boolean>;
 
-  constructor(day: number, isCurrent: boolean) {
+  constructor(year: number, month: number, day: number, isCurrent: boolean) {
+    this.year = year;
+    this.month = month;
     this.day = day;
     this.isCurrent = isCurrent;
+  }
+
+  display(): string {
+    return `${this.year}/${this.month + 1}/${this.day}`;
   }
 }
 // url queryから表示する年月の情報を取得
@@ -76,6 +114,25 @@ const nowMonth = (): void => {
   const now = new Date();
   location.search = `?date=${now.getFullYear()}-${now.getMonth() + 1}`;
 };
+onMounted(async () => {
+  // 祝日情報がわかったら後からJSでつける
+  await fetchSyukujituData().then((syukujituMap) => {
+    const calendarCells = Array.from(
+      document.querySelectorAll<HTMLElement>("table tbody td")
+    );
+    calendarCells
+      .filter((cell) => syukujituMap.get(cell.dataset.date ?? ""))
+      .map((cell) => {
+        cell.classList.add("is-syukujitu");
+        cell.insertAdjacentHTML(
+          "beforeend",
+          `<section>${
+            syukujituMap.get(cell.dataset.date ?? "") ?? ""
+          }</section>`
+        );
+      });
+  });
+});
 </script>
 
 <template>
@@ -111,8 +168,9 @@ const nowMonth = (): void => {
               saturday: x == 7,
               sunday: x == 1,
             }"
+            :data-date="calendar[x + 7 * y - 8].display()"
           >
-            <span>{{ calendar[x + 7 * y - 8].day }}</span>
+            <section>{{ calendar[x + 7 * y - 8].day }}</section>
           </td>
         </tr>
       </tbody>
@@ -147,13 +205,16 @@ main {
     border-collapse: collapse;
     td {
       text-align: center;
-      vertical-align: top;
       font-weight: bold;
       font-size: 2em;
       border: solid 2px #535360;
       background-color: #f2f2f6;
+      width: calc(100% / 7);
     }
     td.sunday {
+      color: #cc1b1b;
+    }
+    td.is-syukujitu {
       color: #cc1b1b;
     }
     td.saturday {
@@ -161,10 +222,14 @@ main {
     }
     thead.day-of-week {
       tr {
-        height: 20px;
+        height: 40px;
       }
     }
     tbody {
+      td {
+        height: calc(100% / 7);
+        vertical-align: top;
+      }
       td:not(.is-current-day) {
         span {
           opacity: 0.3;
