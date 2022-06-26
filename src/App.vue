@@ -40,6 +40,12 @@ console.log(calendar);
 
 <template>
   <main>
+    <header class="calendar-header">
+      <button class="arrow-button">&lt;</button>
+      <section class="current-date">2022/06</section>
+      <button class="arrow-button">&gt;</button>
+      <button>現在</button>
+    </header>
     <table>
       <thead class="day-of-week">
         <tr>
@@ -76,9 +82,25 @@ console.log(calendar);
 main {
   height: 100%;
   color: #191920;
+  header {
+    display: flex;
+    height: 40px;
+    font-size: 2em;
+    section.current-date {
+      margin: auto 15px;
+    }
+    button {
+      margin: 2px;
+      width: 60px;
+    }
+
+    button.arrow-button {
+      width: 40px;
+    }
+  }
   table {
     width: 100%;
-    height: 100%;
+    height: calc(100% - 40px);
     padding: 0px;
     border-collapse: collapse;
     td {
