@@ -111,8 +111,7 @@ const nextMonth = (): void => {
   }`;
 };
 const nowMonth = (): void => {
-  const now = new Date();
-  location.search = `?date=${now.getFullYear()}-${now.getMonth() + 1}`;
+  location.search = "";
 };
 onMounted(async () => {
   // 祝日情報がわかったら後からJSでつける
