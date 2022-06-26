@@ -231,7 +231,7 @@ main {
         vertical-align: top;
       }
       td:not(.is-current-day) {
-        span {
+        section {
           opacity: 0.3;
         }
       }
