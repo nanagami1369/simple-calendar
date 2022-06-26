@@ -113,6 +113,14 @@ const nextMonth = (): void => {
 const nowMonth = (): void => {
   location.search = "";
 };
+const now = new Date();
+const isNow = (formattedDate: string): boolean => {
+  const formattedNowDate = `${now.getFullYear()}/${
+    now.getMonth() + 1
+  }/${now.getDate()}`;
+  return formattedDate === formattedNowDate;
+};
+
 onMounted(async () => {
   // 祝日情報がわかったら後からJSでつける
   await fetchSyukujituData().then((syukujituMap) => {
@@ -166,6 +174,7 @@ onMounted(async () => {
               'is-current-day': calendar[x + 7 * y - 8].isCurrent,
               saturday: x == 7,
               sunday: x == 1,
+              'is-now': isNow(calendar[x + 7 * y - 8].display()),
             }"
             :data-date="calendar[x + 7 * y - 8].display()"
           >
@@ -235,6 +244,9 @@ main {
         section {
           opacity: 0.3;
         }
+      }
+      td.is-now.is-current-day {
+        background-color: #c2c2d7;
       }
     }
   }
