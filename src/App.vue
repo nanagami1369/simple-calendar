@@ -186,7 +186,8 @@ main {
     height: 40px;
     font-size: 2em;
     section.current-date {
-      margin: auto 15px;
+      width: 130px;
+      text-align: center;
     }
     button {
       margin: 2px;
