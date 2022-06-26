@@ -213,11 +213,12 @@ main {
     td.sunday {
       color: #cc1b1b;
     }
-    td.is-syukujitu {
-      color: #cc1b1b;
-    }
+
     td.saturday {
       color: #351bcc;
+    }
+    td.is-syukujitu {
+      color: #cc1b1b;
     }
     thead.day-of-week {
       tr {
