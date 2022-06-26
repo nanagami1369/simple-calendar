@@ -220,6 +220,12 @@ main {
       background-color: #f2f2f6;
       width: calc(100% / 7);
     }
+    @media screen and (orientation: portrait) {
+      td {
+        border: solid 1px #535360;
+        font-size: 1em;
+      }
+    }
     td.sunday {
       color: #cc1b1b;
     }
